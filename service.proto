@@ -1,0 +1,15 @@
+syntax = "proto3";
+package service;
+
+service Service {
+	rpc Ping(PingRequest) returns (PongResponse);
+}
+
+message PingRequest {
+    string req = 1;
+}
+
+message PongResponse {
+    string res = 1;
+    uint32 len = 2;
+}
