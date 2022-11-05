@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"fmt"
 	pb "grpc-project/infrastructure/service"
 	"log"
 	"net"
+	"os"
+	"os/signal"
+	"time"
 
-	"github.com/pkg/errors"
-	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 )
 
@@ -20,31 +20,26 @@ func (s *server) Ping(ctx context.Context, req *pb.PingRequest) (*pb.PongRespons
 }
 
 func main() {
-	_ctx := context.Background()
-	var eg *errgroup.Group
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
 
 	listen, err := net.Listen("tcp", ":5050")
-	errCh := make(chan error)
 
-	eg, ctx := errgroup.WithContext(_ctx)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
 	s := grpc.NewServer()
 	pb.RegisterServiceServer(s, &server{})
 	log.Printf("server listening at %v", listen.Addr())
 
 	go func() {
-		defer close(errCh)
-		if err = s.Serve(listen); err != nil {
-			errCh <- errors.Wrap(err, "failed to serve")
-		}
+		<-ctx.Done()
+		_, cancel := context.WithTimeout(ctx, 5*time.Second)
+		defer cancel()
+		s.GracefulStop()
 	}()
 
-	eg.Go(func() error {
-		<-ctx.Done()
-		return ctx.Err()
-	})
-
-	if err := eg.Wait(); err != nil {
-		fmt.Println(err)
-		return
-	}
+	log.Fatal(s.Serve(listen))
 }
