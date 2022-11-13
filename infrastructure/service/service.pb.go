@@ -139,8 +139,12 @@ var file_service_proto_rawDesc = []byte{
 	0x07, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x33, 0x0a, 0x04, 0x50, 0x69, 0x6e, 0x67,
 	0x12, 0x14, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x50, 0x69, 0x6e, 0x67, 0x52,
 	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x15, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
-	0x2e, 0x50, 0x6f, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x2e, 0x50, 0x6f, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0x44, 0x0a,
+	0x0d, 0x4c, 0x6f, 0x67, 0x67, 0x65, 0x64, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x33,
+	0x0a, 0x04, 0x50, 0x69, 0x6e, 0x67, 0x12, 0x14, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
+	0x2e, 0x50, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x15, 0x2e, 0x73,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x50, 0x6f, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -162,9 +166,11 @@ var file_service_proto_goTypes = []interface{}{
 }
 var file_service_proto_depIdxs = []int32{
 	0, // 0: service.Service.Ping:input_type -> service.PingRequest
-	1, // 1: service.Service.Ping:output_type -> service.PongResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	0, // 1: service.LoggedService.Ping:input_type -> service.PingRequest
+	1, // 2: service.Service.Ping:output_type -> service.PongResponse
+	1, // 3: service.LoggedService.Ping:output_type -> service.PongResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -209,7 +215,7 @@ func file_service_proto_init() {
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_service_proto_goTypes,
 		DependencyIndexes: file_service_proto_depIdxs,
@@ -295,6 +301,78 @@ var _Service_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Ping",
 			Handler:    _Service_Ping_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "service.proto",
+}
+
+// LoggedServiceClient is the client API for LoggedService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type LoggedServiceClient interface {
+	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PongResponse, error)
+}
+
+type loggedServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewLoggedServiceClient(cc grpc.ClientConnInterface) LoggedServiceClient {
+	return &loggedServiceClient{cc}
+}
+
+func (c *loggedServiceClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PongResponse, error) {
+	out := new(PongResponse)
+	err := c.cc.Invoke(ctx, "/service.LoggedService/Ping", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// LoggedServiceServer is the server API for LoggedService service.
+type LoggedServiceServer interface {
+	Ping(context.Context, *PingRequest) (*PongResponse, error)
+}
+
+// UnimplementedLoggedServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedLoggedServiceServer struct {
+}
+
+func (*UnimplementedLoggedServiceServer) Ping(context.Context, *PingRequest) (*PongResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
+}
+
+func RegisterLoggedServiceServer(s *grpc.Server, srv LoggedServiceServer) {
+	s.RegisterService(&_LoggedService_serviceDesc, srv)
+}
+
+func _LoggedService_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LoggedServiceServer).Ping(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/service.LoggedService/Ping",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LoggedServiceServer).Ping(ctx, req.(*PingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _LoggedService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "service.LoggedService",
+	HandlerType: (*LoggedServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Ping",
+			Handler:    _LoggedService_Ping_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

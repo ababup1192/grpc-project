@@ -7,6 +7,7 @@
     - [PingRequest](#service-PingRequest)
     - [PongResponse](#service-PongResponse)
   
+    - [LoggedService](#service-LoggedService)
     - [Service](#service-Service)
   
 - [Scalar Value Types](#scalar-value-types)
@@ -55,6 +56,16 @@
  
 
  
+
+
+<a name="service-LoggedService"></a>
+
+### LoggedService
+
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| Ping | [PingRequest](#service-PingRequest) | [PongResponse](#service-PongResponse) |  |
 
 
 <a name="service-Service"></a>

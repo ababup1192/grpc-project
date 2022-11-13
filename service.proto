@@ -5,6 +5,10 @@ service Service {
 	rpc Ping(PingRequest) returns (PongResponse);
 }
 
+service LoggedService {
+	rpc Ping(PingRequest) returns (PongResponse);
+}
+
 message PingRequest {
     string req = 1;
 }
